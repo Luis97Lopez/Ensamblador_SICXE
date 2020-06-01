@@ -15,7 +15,6 @@ namespace Graphic
         public List<Tuple<string, string>> intermediary_code;
         public Dictionary<string, string> symbol_table;
         public string[] errors;
-        public List<string> registers;
 
         public AnalizadorSICXE(string[] asm_code)
         {

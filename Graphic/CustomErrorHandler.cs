@@ -34,8 +34,8 @@ namespace Graphic
             base.BeginErrorCondition(recognizer);
 
             BinaryWriter writer = new BinaryWriter(new FileStream(Environment.CurrentDirectory + @"\Files\errors.s", FileMode.Append));
-            writer.Write("Error de Sintaxis en línea: " + recognizer.CurrentToken.Line + " - " 
-                + recognizer.CurrentToken.Text + "\n");
+            writer.Write(UTF8Encoding.Default.GetBytes("Error de Sintaxis en linea: " + recognizer.CurrentToken.Line + " - " 
+                + recognizer.CurrentToken.Text + "\n"));
             writer.Close();
         }
     }

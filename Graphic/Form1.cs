@@ -88,44 +88,49 @@ namespace Graphic
         {
             if (asm_code.Lines != null && asm_code.Lines.Length > 0)
             {
-                if (Path.GetExtension(path) == ".s")
+                if (path != null)
                 {
-                    try
+                    if (Path.GetExtension(path) == ".s")
                     {
-                        AnalizadorSIC analizador_sic = new AnalizadorSIC(asm_code.Lines);
-                        analizador_sic.Ensamblar();
+                        try
+                        {
+                            AnalizadorSIC analizador_sic = new AnalizadorSIC(asm_code.Lines);
+                            analizador_sic.Ensamblar();
 
-                        Fill_Intermediary_File(analizador_sic.intermediary_code, analizador_sic.asm_code, analizador_sic.symbol_table);
-                        Fill_TabSim(analizador_sic.symbol_table);
-                        Fill_Registers(analizador_sic.registers);
-                        Fill_Errors(analizador_sic.errors);
+                            Fill_Intermediary_File(analizador_sic.intermediary_code, analizador_sic.asm_code, analizador_sic.symbol_table);
+                            Fill_TabSim(analizador_sic.symbol_table);
+                            Fill_Registers(analizador_sic.registers);
+                            Fill_Errors(analizador_sic.errors);
 
-                        MessageBox.Show("Ensamblado se realizó con éxito");
+                            MessageBox.Show("Ensamblado se realizó con éxito");
+                        }
+                        catch
+                        {
+                            MessageBox.Show("Error en lectura de código. Programa sensible a espacios en blanco y tabulaciones", "Error");
+                        }
                     }
-                    catch
-                    {   
-                        MessageBox.Show("Error en lectura de código. Programa sensible a espacios en blanco y tabulaciones", "Error");
-                    }
-                }
-                else if (Path.GetExtension(path) == ".x")
-                {
-                    try
+                    else if (Path.GetExtension(path) == ".x")
                     {
-                        AnalizadorSICXE analizador_sicxe = new AnalizadorSICXE(asm_code.Lines);
-                        analizador_sicxe.Ensamblar();
-                        Fill_Intermediary_File(analizador_sicxe.intermediary_code, analizador_sicxe.asm_code, analizador_sicxe.symbol_table);
-                        Fill_TabSim(analizador_sicxe.symbol_table);
-                        Fill_Errors(analizador_sicxe.errors);
+                        try
+                        {
+                            AnalizadorSICXE analizador_sicxe = new AnalizadorSICXE(asm_code.Lines);
+                            analizador_sicxe.Ensamblar();
+                            Fill_Intermediary_File(analizador_sicxe.intermediary_code, analizador_sicxe.asm_code, analizador_sicxe.symbol_table);
+                            Fill_TabSim(analizador_sicxe.symbol_table);
+                            Fill_Errors(analizador_sicxe.errors);
+                        }
+                        catch
+                        {
+                            MessageBox.Show("Error en lectura de código. Programa sensible a espacios en blanco y tabulaciones", "Error");
+                        }
                     }
-                    catch
+                    else
                     {
-                        MessageBox.Show("Error en lectura de código. Programa sensible a espacios en blanco y tabulaciones", "Error");
+                        MessageBox.Show("Archivo inválido. Verificar extensión.", "Error");
                     }
                 }
                 else
-                {
-                    MessageBox.Show("Archivo inválido. Verificar extensión.", "Error");
-                }
+                    MessageBox.Show("Guardar archivo con respectiva extensión.", "Error");
             }
         }
 

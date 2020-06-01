@@ -245,11 +245,11 @@
             // errores
             // 
             this.errores.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.errores.Location = new System.Drawing.Point(1045, 57);
+            this.errores.Location = new System.Drawing.Point(1029, 57);
             this.errores.Multiline = true;
             this.errores.Name = "errores";
             this.errores.ReadOnly = true;
-            this.errores.Size = new System.Drawing.Size(139, 258);
+            this.errores.Size = new System.Drawing.Size(155, 258);
             this.errores.TabIndex = 4;
             // 
             // text_programa_objeto
@@ -297,7 +297,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft JhengHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(1047, 26);
+            this.label2.Location = new System.Drawing.Point(1025, 26);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(62, 20);
             this.label2.TabIndex = 9;
