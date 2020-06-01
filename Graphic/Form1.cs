@@ -15,7 +15,6 @@ namespace Graphic
 {
     public partial class lab_grafico : Form
     {
-        AnalizadorSIC analizador;
         string path;
 
         public lab_grafico()
@@ -93,24 +92,35 @@ namespace Graphic
                 {
                     try
                     {
-                        analizador = new AnalizadorSIC(asm_code.Lines);
-                        analizador.Ensamblar();
+                        AnalizadorSIC analizador_sic = new AnalizadorSIC(asm_code.Lines);
+                        analizador_sic.Ensamblar();
 
-                        Fill_Intermediary_File_SIC(analizador.intermediary_code, analizador.asm_code);
-                        Fill_TabSim(analizador.symbol_table);
-                        Fill_Registers(analizador.registers);
-                        Fill_Errors(analizador.errors);
+                        Fill_Intermediary_File(analizador_sic.intermediary_code, analizador_sic.asm_code, analizador_sic.symbol_table);
+                        Fill_TabSim(analizador_sic.symbol_table);
+                        Fill_Registers(analizador_sic.registers);
+                        Fill_Errors(analizador_sic.errors);
 
                         MessageBox.Show("Ensamblado se realizó con éxito");
                     }
                     catch
-                    {
+                    {   
                         MessageBox.Show("Error en lectura de código. Programa sensible a espacios en blanco y tabulaciones", "Error");
                     }
                 }
                 else if (Path.GetExtension(path) == ".x")
                 {
-
+                    try
+                    {
+                        AnalizadorSICXE analizador_sicxe = new AnalizadorSICXE(asm_code.Lines);
+                        analizador_sicxe.Ensamblar();
+                        Fill_Intermediary_File(analizador_sicxe.intermediary_code, analizador_sicxe.asm_code, analizador_sicxe.symbol_table);
+                        Fill_TabSim(analizador_sicxe.symbol_table);
+                        Fill_Errors(analizador_sicxe.errors);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Error en lectura de código. Programa sensible a espacios en blanco y tabulaciones", "Error");
+                    }
                 }
                 else
                 {
@@ -140,9 +150,9 @@ namespace Graphic
             return false;
         }
 
-        private void Fill_Intermediary_File_SIC(List<Tuple<string, string>> file, string[] code)
+        private void Fill_Intermediary_File(List<Tuple<string, string>> file, string[] code, Dictionary<string, string> tabsim)
         {
-            Dictionary<string, string> tabsim = analizador.symbol_table;
+
             List<string[]> res = new List<string[]>();
             int i = 0;
             foreach (var item in code)
@@ -179,11 +189,13 @@ namespace Graphic
                 dgv_archivo_intermedio.Rows.Add(item);
         }
 
+
         private void Fill_TabSim(Dictionary<string,string> tabsim)
         {
             dgv_tabsim.Rows.Clear();
-            foreach (var item in tabsim)
-                dgv_tabsim.Rows.Add(new string[] { item.Key, item.Value });
+            if(tabsim != null)
+                foreach (var item in tabsim)
+                    dgv_tabsim.Rows.Add(new string[] { item.Key, item.Value });
         }
 
         private void Fill_Registers(List<string> registers)
@@ -200,7 +212,7 @@ namespace Graphic
         private void Fill_Errors(string [] errors)
         {
             if (errors.Length > 0)
-                errores.Lines = analizador.errors;
+                errores.Lines = errors;
             else
                 errores.Lines = new string[] { "No hay errores" };
         }
