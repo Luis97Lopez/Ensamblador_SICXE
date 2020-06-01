@@ -23,30 +23,124 @@ namespace Graphic
             InitializeComponent();
         }
 
-        private void ensamblar_Click(object sender, EventArgs e)
+        private void nuevoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (asm_code.Lines != null && asm_code.Lines.Length > 0)
+            if (path != null)
             {
-                try
-                {
-                    analizador = new AnalizadorSIC(asm_code.Lines);
-                    analizador.Ensamblar();
+                asm_code.Lines = null;
+                path = null;
+                ClearAll();
+                this.Text = this.Text.Substring(0, this.Text.IndexOf('-') - 1);
+            }
+        }
 
-                    Fill_Intermediary_File(analizador.intermediary_code, analizador.asm_code);
-                    Fill_TabSim(analizador.symbol_table);
-                    Fill_Registers(analizador.registers);
-                    Fill_Errors();
+        private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (path != null)
+                this.Text = this.Text.Substring(0, this.Text.IndexOf('-') - 1);
 
-                    MessageBox.Show("Ensamblado se realizó con éxito");
-                }
-                catch
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.InitialDirectory = Environment.CurrentDirectory + @"\Codes";
+            openFileDialog.Filter = "SIC Extended (*.x)|*.x| " +
+                                    "SIC Standard (*.s)|*.s| " +
+                                    "All files(*.*)|*.*";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+
+                if (!OpenCodeFile(openFileDialog.FileName))
+                    MessageBox.Show("Error al abrir archivo.", "Error");
+            }
+        }
+
+        private void guardarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (path != null)
+            {
+                File.WriteAllLines(path, asm_code.Lines);
+                MessageBox.Show("Archivo guardado correctamente.", "Ensamblador SIC Estándar");
+            }
+            else
+            {
+                Stream prueba;
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.InitialDirectory = Environment.CurrentDirectory + @"\Codes";
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    MessageBox.Show("Error en lectura de código. Programa sensible a espacios en blanco y tabulaciones", "Error");
+                    if ((prueba = saveFileDialog.OpenFile()) != null)
+                        prueba.Close();
+                    File.WriteAllLines(saveFileDialog.FileName, asm_code.Lines);
+                    OpenCodeFile(saveFileDialog.FileName);
                 }
             }
         }
 
-        private void Fill_Intermediary_File(List<Tuple<string, string>> file, string[] code)
+        private void cerrarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (path != null)
+            {
+                path = null;
+                asm_code.Lines = null;
+                ClearAll();
+                this.Text = this.Text.Substring(0, this.Text.IndexOf('-') - 1);
+            }
+        }
+
+        private void ensamblar_Click(object sender, EventArgs e)
+        {
+            if (asm_code.Lines != null && asm_code.Lines.Length > 0)
+            {
+                if (Path.GetExtension(path) == ".s")
+                {
+                    try
+                    {
+                        analizador = new AnalizadorSIC(asm_code.Lines);
+                        analizador.Ensamblar();
+
+                        Fill_Intermediary_File_SIC(analizador.intermediary_code, analizador.asm_code);
+                        Fill_TabSim(analizador.symbol_table);
+                        Fill_Registers(analizador.registers);
+                        Fill_Errors(analizador.errors);
+
+                        MessageBox.Show("Ensamblado se realizó con éxito");
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Error en lectura de código. Programa sensible a espacios en blanco y tabulaciones", "Error");
+                    }
+                }
+                else if (Path.GetExtension(path) == ".x")
+                {
+
+                }
+                else
+                {
+                    MessageBox.Show("Archivo inválido. Verificar extensión.", "Error");
+                }
+            }
+        }
+
+        private void ClearAll()
+        {
+            dgv_archivo_intermedio.Rows.Clear();
+            dgv_tabsim.Rows.Clear();
+            errores.Text = "";
+            text_programa_objeto.Text = "";
+        }
+
+        private bool OpenCodeFile(string temp_path)
+        {
+            if (temp_path != null)
+            {
+                this.path = temp_path;
+                ClearAll();
+                FillAsmCode();
+                this.Text += " - " + Path.GetFileName(path);
+                return true;
+            }
+            return false;
+        }
+
+        private void Fill_Intermediary_File_SIC(List<Tuple<string, string>> file, string[] code)
         {
             Dictionary<string, string> tabsim = analizador.symbol_table;
             List<string[]> res = new List<string[]>();
@@ -98,93 +192,14 @@ namespace Graphic
             text_programa_objeto.Lines = registers.ToArray();
         }
 
-        private void nuevoToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (path != null)
-            {
-                asm_code.Lines = null;
-                path = null;
-                ClearAll();
-                this.Text = this.Text.Substring(0, this.Text.IndexOf('-') - 1);
-            }
-        }
-
-        private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if(path!= null)
-                this.Text = this.Text.Substring(0, this.Text.IndexOf('-') - 1);
-
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = Environment.CurrentDirectory + @"\Codes";
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                if (!OpenCodeFile(openFileDialog.FileName))
-                    MessageBox.Show("Error al abrir archivo.", "Error");
-            }
-        }
-
-        private bool OpenCodeFile(string temp_path)
-        {
-            if (temp_path != null)
-            {
-                this.path = temp_path;
-                ClearAll();
-                FillAsmCode();
-                this.Text += " - " + Path.GetFileName(path);
-                return true;
-            }
-            return false;
-        }
-
-        private void guardarToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (path != null)
-            {
-                File.WriteAllLines(path, asm_code.Lines);
-                MessageBox.Show("Archivo guardado correctamente.", "Ensamblador SIC Estándar");
-            }
-            else
-            {
-                Stream prueba;
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-                saveFileDialog.InitialDirectory = Environment.CurrentDirectory + @"\Codes";
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    if ((prueba = saveFileDialog.OpenFile()) != null)
-                        prueba.Close();
-                    File.WriteAllLines(saveFileDialog.FileName, asm_code.Lines);
-                    OpenCodeFile(saveFileDialog.FileName);
-                }
-            }
-        }
-
-        private void ClearAll()
-        {
-            dgv_archivo_intermedio.Rows.Clear();
-            dgv_tabsim.Rows.Clear();
-            errores.Text = "";
-            text_programa_objeto.Text = "";
-        }
-
         private void FillAsmCode()
         {
             asm_code.Lines = File.ReadAllLines(path);
         }
 
-        private void cerrarToolStripMenuItem_Click(object sender, EventArgs e)
+        private void Fill_Errors(string [] errors)
         {
-            if (path != null)
-            {
-                path = null;
-                asm_code.Lines = null;
-                ClearAll();
-                this.Text = this.Text.Substring(0, this.Text.IndexOf('-') - 1);
-            }
-        }
-
-        private void Fill_Errors()
-        {
-            if (analizador.errors.Length > 0)
+            if (errors.Length > 0)
                 errores.Lines = analizador.errors;
             else
                 errores.Lines = new string[] { "No hay errores" };
