@@ -15,7 +15,7 @@ namespace Graphic
 {
     public partial class lab_grafico : Form
     {
-        Analizador analizador;
+        AnalizadorSIC analizador;
         string path;
 
         public lab_grafico()
@@ -29,7 +29,7 @@ namespace Graphic
             {
                 try
                 {
-                    analizador = new Analizador(asm_code.Lines);
+                    analizador = new AnalizadorSIC(asm_code.Lines);
                     analizador.Ensamblar();
 
                     Fill_Intermediary_File(analizador.intermediary_code, analizador.asm_code);

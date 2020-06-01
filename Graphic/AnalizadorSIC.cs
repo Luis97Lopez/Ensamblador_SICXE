@@ -9,7 +9,7 @@ using Antlr4.Runtime;
 
 namespace Graphic
 {
-    class Analizador
+    class AnalizadorSIC
     {
         public string[] asm_code;
         public List<Tuple<string, string>> intermediary_code;
@@ -17,7 +17,7 @@ namespace Graphic
         public string[] errors;
         public List<string> registers;
 
-        public Analizador(string[] asm_code)
+        public AnalizadorSIC(string[] asm_code)
         {
             this.asm_code = asm_code;
         }
