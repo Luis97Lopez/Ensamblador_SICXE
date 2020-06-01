@@ -504,7 +504,7 @@
             this.ImeMode = System.Windows.Forms.ImeMode.KatakanaHalf;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "lab_grafico";
-            this.Text = "Laboratorio Gráfico de Programación de Sistemas";
+            this.Text = "SICXE Laboratorio de Programación de Sistemas";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgv_archivo_intermedio)).EndInit();
