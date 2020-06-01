@@ -28,7 +28,6 @@ namespace Graphic
             {
                 string errors_path = Environment.CurrentDirectory + @"\Files\errors.s";
                 Directory.CreateDirectory(Environment.CurrentDirectory + @"\Files\");
-                Directory.CreateDirectory(Environment.CurrentDirectory + @"\Files\SIC\");
                 FileStream intermediary_file = new FileStream(Environment.CurrentDirectory + @"\Files\intermediary.s", FileMode.Create);
                 FileStream tabsim_file = new FileStream(Environment.CurrentDirectory + @"\Files\tabsim.s", FileMode.Create);
                 FileStream object_program = new FileStream(Environment.CurrentDirectory + @"\Files\object.o", FileMode.Create);
