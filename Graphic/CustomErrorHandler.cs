@@ -32,7 +32,9 @@ namespace Graphic
         protected override void BeginErrorCondition([NotNull] Parser recognizer)
         {
             base.BeginErrorCondition(recognizer);
-
+            Console.WriteLine("-------------------");
+            Console.WriteLine(recognizer.CurrentToken.Text);
+            Console.WriteLine("*******************");
             BinaryWriter writer = new BinaryWriter(new FileStream(Environment.CurrentDirectory + @"\Files\errors.s", FileMode.Append));
             writer.Write(UTF8Encoding.Default.GetBytes("Error de Sintaxis en linea: " + recognizer.CurrentToken.Line + " - " 
                 + recognizer.CurrentToken.Text + "\n"));
