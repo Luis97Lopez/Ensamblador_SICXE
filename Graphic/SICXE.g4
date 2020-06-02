@@ -73,23 +73,76 @@ options {
 
  instruccion returns [string codigo_obj, int pc]
  	:	
-		etiqueta nemonico_f1 {$codigo_obj = $nemonico_f1.codigo_op; $pc = 1;}
-		|
-		etiqueta nemonico_f2 opinstruccion2 {$codigo_obj = $nemonico_f2.codigo_op; $pc = 2;}
-		|
-		etiqueta nemonico_f3 opinstruccion3 {$codigo_obj = $nemonico_f3.codigo_op; $pc = 3;}
-		| 
-		etiqueta RSUB  {$codigo_obj = "4C0000"; $pc = 3;}
-		|
-		etiqueta nemonico_f4 opinstruccion3 {$codigo_obj = $nemonico_f4.codigo_op; $pc = 4;}
+		etiqueta formato {$codigo_obj = "-----"; $pc = $formato.pc;}
  	;
+ formato returns [string value, int pc]
+	:
+		formato1 {$pc = 1;}
+		|
+		formato2 {$pc = 2;}
+		|
+		formato3 {$pc = 3;}
+		|
+		formato4 {$pc = 4;}
+	;
 
- directiva returns  [int pc_value, string codigo_ob]
- 	:	etiqueta RESB  numero		{$pc_value = $numero.value; $codigo_ob = "------"; }	|
-		etiqueta RESW  numero		{$pc_value = ($numero.value * 3); $codigo_ob= "------"; }	|
-		etiqueta BYTE  opdirectiva	{$pc_value = $opdirectiva.value; $codigo_ob = $opdirectiva.cod;}	|
-		etiqueta WORD  numero		{$pc_value = 3; $codigo_ob= $numero.value.ToString("X6");}
-		etiqueta BASE ID
+ formato1 returns [string codigo_obj]
+	:
+		nemonico_f1 {$codigo_obj = $nemonico_f1.codigo_op;}
+	;
+ formato2 returns [string codigo_obj]
+	:
+		nemonico_f2 numero {$codigo_obj = $nemonico_f2.codigo_op;}
+		|
+		nemonico_f2 registro {$codigo_obj = $nemonico_f2.codigo_op;}
+		|
+		nemonico_f2 registro ',' registro {$codigo_obj = $nemonico_f2.codigo_op;}
+		|
+		nemonico_f2 registro ',' numero {$codigo_obj = $nemonico_f2.codigo_op;}
+	;
+
+formato3 returns [string codigo_obj]
+	:
+		simple3
+		|
+		indirecto3
+		|
+		inmediato3
+	;
+
+simple3 returns [string value]
+	:
+		nemonico_f3 ID indexado
+		|
+		nemonico_f3 numero indexado
+	;
+indirecto3 returns [string value]
+	:
+		nemonico_f3 AT numero
+		|
+		nemonico_f3 AT ID
+	;
+inmediato3 returns [string value]
+	:
+		nemonico_f3 CHARP numero
+		|
+		nemonico_f3 CHARP ID
+	;
+ formato4 returns [string codigo_obj]
+	:
+		PLUS formato3
+	;
+
+directiva returns  [int pc_value, string codigo_ob]
+ 	:	etiqueta RESB  numero{$pc_value = $numero.value; $codigo_ob = "------"; }	
+		|
+		etiqueta RESW  numero{$pc_value = ($numero.value * 3); $codigo_ob= "------"; }	
+		|
+		etiqueta BYTE  opdirectiva{$pc_value = $opdirectiva.value; $codigo_ob = $opdirectiva.cod;}	
+		|
+		etiqueta WORD  numero{$pc_value = 3; $codigo_ob= $numero.value.ToString("X6");}  
+		|
+		etiqueta BASE ID {$pc_value = 0; $codigo_ob= "-----";}
 		;
 
 etiqueta returns[string value]
@@ -109,11 +162,11 @@ program_name returns[string value]
 
 opinstruccion2 returns [string value]
 	:
-		registro ',' registro
+		registro ',' registro {$value = "[" + $registro.value + "," + $registro.value + "]";}
 		|
-		registro ',' numero
+		registro ',' numero {$value = "[" + $registro.value + "," + $numero.value + "]";}
 		| 
-		registro
+		registro {$value = "[" + $registro.value + ", 0]";}
 	;
 
 opinstruccion3 returns [string value]
@@ -121,11 +174,13 @@ opinstruccion3 returns [string value]
 		|
 		numero indexado {$value = $indexado.value + $numero.value.ToString();}
 		|
-		'@' ID {$value = '@' + $ID.text;}
+		AT ID {$value = '@' + $ID.text;}
 		|
-		'@' numero {$value = '@' + $numero.value.ToString();}
+		AT numero {$value = '@' + $numero.value.ToString();}
 		|
-		'#' numero {$value = '#' + $numero.value.ToString();}
+		CHARP numero {$value = '#' + $numero.value.ToString();}
+		|
+		'#' ID {$value = '#' + $ID.text;}
 	;
 
 indexado returns [string value]
@@ -174,7 +229,7 @@ nemonico_f1 returns[string codigo_op]
 
 nemonico_f2 returns[string codigo_op]
 	:
-		ADDR {$codigo_op = "90";}
+		  ADDR {$codigo_op = "90";}
 		| CLEAR {$codigo_op = "B4";}
 		| COMPR {$codigo_op = "A0";}
 		| DIVR {$codigo_op = "9C";}
@@ -186,6 +241,11 @@ nemonico_f2 returns[string codigo_op]
 		| SVC {$codigo_op = "B0";}
 		| TIXR {$codigo_op = "B8";}
 	;
+
+nemonico_f4 returns[string codigo_op]
+:
+	PLUS nemonico_f3 opinstruccion3 {$codigo_op = $nemonico_f3.codigo_op;}
+;
 
 nemonico_f3 returns[string codigo_op]
 	:
@@ -229,10 +289,7 @@ nemonico_f3 returns[string codigo_op]
 		| TIX  {$codigo_op = "2C";}
 		| WD  {$codigo_op = "DC";}
 	;
-nemonico_f4 returns[string codigo_op]
-	:
-		'+' nemonico_f3 {$codigo_op = $nemonico_f3.codigo_op;}
-	;
+
 
 
 /*
@@ -244,6 +301,9 @@ WS		: 	(' '|'\r'|'\t')+ {Skip();};
 C		:	'C';
 X		:	'X';
 H		:	[Hh];
+PLUS	:	'+';
+CHARP	:	'#';
+AT		:	'@';
 
 //Registros
 A		:	'A';

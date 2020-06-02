@@ -113,6 +113,8 @@ namespace Graphic
                     {
                         try
                         {
+                            Console.WriteLine("Chale");
+
                             AnalizadorSICXE analizador_sicxe = new AnalizadorSICXE(asm_code.Lines);
                             analizador_sicxe.Ensamblar();
                             Fill_Intermediary_File(analizador_sicxe.intermediary_code, analizador_sicxe.asm_code, analizador_sicxe.symbol_table);

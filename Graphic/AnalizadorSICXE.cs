@@ -34,9 +34,9 @@ namespace Graphic
                 error_program.Close();
 
                 string temp_code = string.Join("\n", asm_code);
-                SICLexer lex = new SICLexer(new AntlrInputStream(temp_code));
+                SICXELexer lex = new SICXELexer(new AntlrInputStream(temp_code));
                 CommonTokenStream tokens = new CommonTokenStream(lex);
-                SICParser parser = new SICParser(tokens);
+                SICXEParser parser = new SICXEParser(tokens);
 
                 parser.ErrorHandler = new CustomErrorHandler();
 
